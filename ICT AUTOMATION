@@ -1,0 +1,132 @@
+# ICT Help Desk Simulation
+
+class HelpDeskRequest:
+    def __init__(self, user_name, issue_desc):
+        self.user_name = user_name
+        self.issue_desc = issue_desc
+        self.status = "Reported"
+        self.related = None
+        self.solution = None
+        self.solution_accepted = None
+
+    def __str__(self):
+        return f"{self.user_name} | Issue: {self.issue_desc} | Status: {self.status}"
+
+# Simulated database
+requests_db = []
+
+# Step 1: User reports issue
+def report_issue():
+    name = input("Enter your name: ")
+    issue = input("Describe your issue: ")
+    request = HelpDeskRequest(name, issue)
+    requests_db.append(request)
+    print("✅ Issue reported to ICT Help Desk.")
+
+# Step 2: Helpdesk validates issue
+def validate_issues():
+    for req in requests_db:
+        if req.status == "Reported":
+            print(f"\n🔍 Validating issue from {req.user_name}: {req.issue_desc}")
+            related = input("Is the issue related to ICT services? (yes/no): ").strip().lower()
+            if related == "yes":
+                req.related = True
+                req.status = "Validated - Service Team Required"
+            else:
+                req.related = False
+                req.status = "Not Related - Escalation or External Support"
+    print("✅ Validation complete.")
+
+# Step 3: Service team handles related issues
+def service_team_check():
+    for req in requests_db:
+        if req.status == "Validated - Service Team Required":
+            print(f"\n🛠️ Service team checking machine for {req.user_name}...")
+            diagnosis = input("Is the issue confirmed after check-up? (yes/no): ").strip().lower()
+            if diagnosis == "yes":
+                req.status = "Confirmed - Developing Solution"
+                req.solution = input("Enter solution developed: ")
+                req.status = "Solution Developed - Testing"
+            else:
+                req.status = "Unrelated After Check - Escalate or Revalidate"
+    print("🔎 Service team check complete.")
+
+# Step 4: Test solution
+def test_solution():
+    for req in requests_db:
+        if req.status == "Solution Developed - Testing":
+            print(f"\n🧪 Testing solution for {req.user_name}'s issue...")
+            passed = input("Did the solution pass the internal test? (yes/no): ").strip().lower()
+            if passed == "yes":
+                req.status = "Test Passed - Awaiting User Validation"
+            else:
+                req.status = "Failed Test - Return to Service Team"
+    print("✅ Solution testing complete.")
+
+# Step 5: User validation
+def user_validation():
+    for req in requests_db:
+        if req.status == "Test Passed - Awaiting User Validation":
+            print(f"\n📲 Solution sent to {req.user_name}: {req.solution}")
+            response = input("User, do you accept the solution? (yes/no): ").strip().lower()
+            if response == "yes":
+                req.solution_accepted = True
+                req.status = "User Accepted - Gadget Ready for Collection"
+                print("✅ User accepted the solution.")
+            else:
+                req.solution_accepted = False
+                req.status = "Rejected - Returned to Service Team"
+                print("🔁 Returned to Service Team for revision.")
+
+# Step 6: Gadget collection
+def collect_gadget():
+    for req in requests_db:
+        if req.status == "User Accepted - Gadget Ready for Collection":
+            print(f"🎉 {req.user_name}, your device is ready. Please collect it.")
+            req.status = "Closed"
+    print("📦 Collection complete.")
+
+# View current request status
+def view_requests():
+    print("\n📋 Current Help Desk Requests:")
+    for i, req in enumerate(requests_db):
+        print(f"{i+1}. {req}")
+
+# Main menu
+def main_menu():
+    while True:
+        print("\n=== ICT HELP DESK SYSTEM ===")
+        print("1. Report an Issue (User)")
+        print("2. Validate Issues (Helpdesk)")
+        print("3. Service Team Check")
+        print("4. Test Solutions")
+        print("5. User Validation")
+        print("6. Collect Gadget")
+        print("7. View All Requests")
+        print("8. Exit")
+
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            report_issue()
+        elif choice == "2":
+            validate_issues()
+        elif choice == "3":
+            service_team_check()
+        elif choice == "4":
+            test_solution()
+        elif choice == "5":
+            user_validation()
+        elif choice == "6":
+            collect_gadget()
+        elif choice == "7":
+            view_requests()
+        elif choice == "8":
+            print("Goodbye.")
+            break
+        else:
+            print("Invalid option.")
+
+# Run the system
+if __name__ == "__main__":
+    main_menu()

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kakamega Waste Management</title>
+  <style>
+    body {
+      background-color: #d4fcd4;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+      color: green;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      display: none;
+    }
+    .visible {
+      display: block;
+    }
+    input, button, select {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: green;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .card {
+      background: #eaffea;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #bbb;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Kakamega Waste Management</h1>
+
+<!-- Login Section -->
+<div class="container visible" id="loginSection">
+  <h2>Login</h2>
+  <input id="username" placeholder="Username" value="davis" />
+  <input id="password" type="password" placeholder="Password" value="123" />
+  <button onclick="authenticate()">Login</button>
+  <p id="loginError" style="color: red;"></p>
+</div>
+
+<!-- Role Selection Section -->
+<div class="container" id="roleSection">
+  <h2>Select Role</h2>
+  <button onclick="showSection('residentSection')">Login as Resident</button>
+  <button onclick="showSection('staffSection')">Login as Staff</button>
+</div>
+
+<!-- Resident Dashboard -->
+<div class="container" id="residentSection">
+  <h2>Resident Dashboard</h2>
+  <input id="resName" placeholder="Your Name" value="Davis" />
+  <input id="resPhone" placeholder="Phone Number" />
+  <input id="resLocation" placeholder="Location" />
+  <select id="resQuantity">
+    <option value="Truck">Truck</option>
+    <option value="Pick Up">Pick Up</option>
+    <option value="Wheel Barrow">Wheel Barrow</option>
+  </select>
+  <button onclick="submitRequest()">Submit Request</button>
+  <div id="residentRequests"></div>
+  <button onclick="goHome()">Logout</button>
+</div>
+
+<!-- Staff Dashboard -->
+<div class="container" id="staffSection">
+  <h2>Staff Dashboard</h2>
+  <button onclick="viewRequests()">View Requests</button>
+  <button onclick="validate()">Validate</button>
+  <button onclick="schedule()">Schedule</button>
+  <button onclick="notifySanitation()">Notify Sanitation</button>
+  <button onclick="notifyResidents()">Notify Residents</button>
+  <div id="staffRequests"></div>
+  <button onclick="goHome()">Logout</button>
+</div>
+
+<script>
+  const users = {
+    "davis": { password: "123" }
+  };
+
+  const STATUSES = [
+    "Submitted",
+    "Validated",
+    "Scheduled",
+    "Sent to Sanitation Team",
+    "Notified Resident",
+    "Collected",
+    "Resident Confirmed",
+    "Failed - Restart Required"
+  ];
+
+  const requests = [];
+
+  function showSection(id) {
+    document.querySelectorAll('.container').forEach(sec => sec.classList.remove('visible'));
+    document.getElementById(id).classList.add('visible');
+    if (id === 'residentSection') {
+      showResidentRequests();
+    }
+    if (id === 'staffSection') {
+      viewRequests();
+    }
+  }
+
+  function goHome() {
+    location.reload();
+  }
+
+  function authenticate() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const user = users[username];
+    if (user && user.password === password) {
+      showSection("roleSection");
+    } else {
+      document.getElementById("loginError").innerText = "❌ Invalid credentials";
+    }
+  }
+
+  function submitRequest() {
+    const req = {
+      name: document.getElementById("resName").value,
+      phone: document.getElementById("resPhone").value,
+      location: document.getElementById("resLocation").value,
+      quantity: document.getElementById("resQuantity").value,
+      status: STATUSES[0],
+      schedule: null
+    };
+    requests.push(req);
+    alert("✅ Request submitted!");
+    showResidentRequests();
+  }
+
+  function showResidentRequests() {
+    const div = document.getElementById("residentRequests");
+    div.innerHTML = "";
+    requests.forEach((r, i) => {
+      div.innerHTML += `
+        <div class="card">
+          <b>${r.name}</b><br>
+          ${r.quantity} @ ${r.location}<br>
+          Status: ${r.status}<br>
+          Schedule: ${r.schedule || "Not Set"}
+        </div>`;
+    });
+  }
+
+  function viewRequests() {
+    const div = document.getElementById("staffRequests");
+    div.innerHTML = "";
+    requests.forEach((r, i) => {
+      div.innerHTML += `
+        <div class="card">
+          <b>${r.name}</b><br>
+          ${r.quantity} @ ${r.location}<br>
+          Status: ${r.status}<br>
+          Schedule: ${r.schedule || "Not Set"}
+        </div>`;
+    });
+  }
+
+  function validate() {
+    requests.forEach(r => {
+      if (r.status === "Submitted") r.status = "Validated";
+    });
+    alert("✅ Validated requests");
+    viewRequests();
+  }
+
+  function schedule() {
+    requests.forEach(r => {
+      if (r.status === "Validated") {
+        const time = prompt(`Enter schedule for ${r.name}:`);
+        if (time) {
+          r.schedule = time;
+          r.status = "Scheduled";
+        }
+      }
+    });
+    viewRequests();
+  }
+
+  function notifySanitation() {
+    requests.forEach(r => {
+      if (r.status === "Scheduled") r.status = "Sent to Sanitation Team";
+    });
+    alert("🧹 Sanitation team notified");
+    viewRequests();
+  }
+
+  function notifyResidents() {
+    requests.forEach(r => {
+      if (r.status === "Sent to Sanitation Team") {
+        r.status = "Notified Resident";
+        alert(`📩 Notified ${r.phone}`);
+      }
+    });
+    viewRequests();
+  }
+</script>
+
+</body>
+</html>

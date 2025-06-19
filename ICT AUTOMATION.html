@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ICT Help Desk System</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #000000, #003366);
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #00ccff;
+    }
+    .section {
+      border: 1px solid #00ccff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+    label, input, textarea, button, select {
+      display: block;
+      margin-top: 10px;
+      width: 100%;
+    }
+    button {
+      background-color: #00ccff;
+      border: none;
+      padding: 10px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .request-card {
+      border: 1px solid #00ccff;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      background-color: #001f33;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ICT Help Desk System</h1>
+
+  <div class="section">
+    <h2>1. Report an Issue</h2>
+    <input id="userName" type="text" placeholder="Your Name" />
+    <textarea id="issueDesc" placeholder="Describe your issue..."></textarea>
+    <button onclick="reportIssue()">Submit Issue</button>
+  </div>
+
+  <div class="section">
+    <h2>2. View & Manage Issues</h2>
+    <button onclick="renderRequests()">Refresh Request List</button>
+    <div id="requestList"></div>
+  </div>
+
+  <script>
+    const requests = [];
+
+    function reportIssue() {
+      const name = document.getElementById('userName').value.trim();
+      const issue = document.getElementById('issueDesc').value.trim();
+
+      if (name && issue) {
+        requests.push({
+          user_name: name,
+          issue_desc: issue,
+          status: "Reported",
+          related: null,
+          solution: null,
+          solution_accepted: null
+        });
+        alert("✅ Issue reported successfully.");
+        document.getElementById('userName').value = '';
+        document.getElementById('issueDesc').value = '';
+        renderRequests();
+      } else {
+        alert("Please enter both name and issue description.");
+      }
+    }
+
+    function updateStatus(index, nextStep) {
+      const req = requests[index];
+      switch (nextStep) {
+        case 'validate':
+          req.related = confirm("Is the issue related to ICT?");
+          req.status = req.related ? "Validated - Service Team Required" : "Not Related - External Support";
+          break;
+        case 'service':
+          const confirmed = confirm("Is the issue confirmed?");
+          if (confirmed) {
+            const solution = prompt("Enter the solution developed:");
+            req.solution = solution;
+            req.status = "Solution Developed - Testing";
+          } else {
+            req.status = "Unrelated After Check - Revalidate";
+          }
+          break;
+        case 'test':
+          const passed = confirm("Did the solution pass internal testing?");
+          req.status = passed ? "Test Passed - Awaiting User Validation" : "Failed Test - Return to Service Team";
+          break;
+        case 'validateUser':
+          const accepted = confirm(`${req.user_name}, do you accept the solution: "${req.solution}"?`);
+          req.solution_accepted = accepted;
+          req.status = accepted ? "User Accepted - Gadget Ready for Collection" : "Rejected - Returned to Service Team";
+          break;
+        case 'collect':
+          alert(`${req.user_name}, please collect your device.`);
+          req.status = "Closed";
+          break;
+      }
+      renderRequests();
+    }
+
+    function renderRequests() {
+      const list = document.getElementById("requestList");
+      list.innerHTML = "";
+
+      requests.forEach((req, index) => {
+        const card = document.createElement("div");
+        card.className = "request-card";
+        card.innerHTML = `
+          <strong>${req.user_name}</strong><br>
+          Issue: ${req.issue_desc}<br>
+          Status: ${req.status}<br>
+          ${req.solution ? "Solution: " + req.solution + "<br>" : ""}
+          <div style="margin-top:10px;">
+            ${req.status === "Reported" ? `<button onclick="updateStatus(${index}, 'validate')">Validate</button>` : ""}
+            ${req.status === "Validated - Service Team Required" ? `<button onclick="updateStatus(${index}, 'service')">Service Check</button>` : ""}
+            ${req.status === "Solution Developed - Testing" ? `<button onclick="updateStatus(${index}, 'test')">Test Solution</button>` : ""}
+            ${req.status === "Test Passed - Awaiting User Validation" ? `<button onclick="updateStatus(${index}, 'validateUser')">User Accept?</button>` : ""}
+            ${req.status === "User Accepted - Gadget Ready for Collection" ? `<button onclick="updateStatus(${index}, 'collect')">Mark as Collected</button>` : ""}
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+  </script>
+
+</body>
+</html>

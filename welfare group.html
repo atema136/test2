@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welfare Group Registration</title>
+  <style>
+    body {
+      background-color: #fff700;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    .section {
+      background-color: #ffffcc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 2px solid #333;
+    }
+    label, input, textarea, select, button {
+      display: block;
+      margin-top: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+    button {
+      background-color: #333;
+      color: yellow;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📌 Kakamega County Social Welfare Group Registration</h1>
+  <form id="registrationForm">
+
+    <div class="section">
+      <h2>1. Register Member</h2>
+      <label>Name:</label>
+      <input type="text" id="name" required>
+
+      <label>Age:</label>
+      <input type="number" id="age" min="18" required>
+
+      <label>Location (village/ward):</label>
+      <input type="text" id="location" required>
+
+      <label>ID Number:</label>
+      <input type="text" id="idNumber" required>
+
+      <label>Has Signed?</label>
+      <select id="signed">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <h2>2. Group Objectives</h2>
+      <textarea id="objectives" placeholder="Enter objectives separated by commas..." required></textarea>
+    </div>
+
+    <div class="section">
+      <h2>3. Proposed Group Names</h2>
+      <input type="text" id="name1" placeholder="Name 1" required>
+      <input type="text" id="name2" placeholder="Name 2" required>
+      <input type="text" id="name3" placeholder="Name 3" required>
+      <label>Choose Final Name:</label>
+      <select id="finalName">
+        <option value="">-- Select Final Name --</option>
+        <option value="1">Name 1</option>
+        <option value="2">Name 2</option>
+        <option value="3">Name 3</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <h2>4. Elect Officials</h2>
+      <input type="text" id="chair" placeholder="Chairperson Name" required>
+      <input type="text" id="secretary" placeholder="Secretary Name" required>
+      <input type="text" id="treasurer" placeholder="Treasurer Name" required>
+    </div>
+
+    <div class="section">
+      <h2>5. Draft Constitution</h2>
+      <textarea placeholder="Membership Rules" required></textarea>
+      <textarea placeholder="Roles & Responsibilities" required></textarea>
+      <textarea placeholder="Financial Management" required></textarea>
+      <textarea placeholder="Meeting Structure" required></textarea>
+      <textarea placeholder="Conflict Resolution" required></textarea>
+    </div>
+
+    <div class="section">
+      <h2>6. Minutes of Formation Meeting</h2>
+      <textarea id="minutes" required></textarea>
+    </div>
+
+    <div class="section">
+      <h2>7. Physical Address</h2>
+      <input type="text" id="address" required>
+    </div>
+
+    <div class="section">
+      <h2>8. Registration Fee</h2>
+      <input type="number" id="fee" placeholder="KES 1000 - 2000" required>
+      <input type="text" id="receipt" placeholder="Receipt Number" required>
+    </div>
+
+    <div class="section">
+      <h2>9. Passport Photos</h2>
+      <label>Have all officials submitted passport photos?</label>
+      <select id="photos">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+
+    <button type="submit">✅ Complete Registration</button>
+  </form>
+
+  <script>
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const age = parseInt(document.getElementById('age').value);
+      const fee = parseInt(document.getElementById('fee').value);
+      const finalNameIdx = document.getElementById('finalName').value;
+
+      if (age < 18) {
+        alert("❌ Age must be at least 18.");
+        return;
+      }
+
+      if (fee < 1000 || fee > 2000) {
+        alert("❌ Registration fee must be between 1000 and 2000.");
+        return;
+      }
+
+      if (!finalNameIdx) {
+        alert("❌ Please select a final group name.");
+        return;
+      }
+
+      alert("✅ Registration Completed Successfully!");
+    });
+  </script>
+</body>
+</html>

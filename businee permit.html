@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Business Permit Application - Kakamega County</title>
+  <style>
+    body {
+      background-color: #e0f0ff; /* Light blue background */
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #003366;
+    }
+    form {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input[type="text"], input[type="number"], input[type="tel"], input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input[type="submit"] {
+      background-color: #007acc;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    input[type="submit"]:hover {
+      background-color: #005fa3;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kakamega County Business Permit Application</h1>
+
+  <form>
+    <div class="section">
+      <h2>Step 1: Application & Submission</h2>
+      <label>Applicant Full Name:</label>
+      <input type="text" name="applicant_name" required>
+
+      <label>Business Name:</label>
+      <input type="text" name="business_name" required>
+
+      <label>Business Type:</label>
+      <input type="text" name="business_type" placeholder="Retail / Service / Other" required>
+
+      <label>Business Location (Town/Ward):</label>
+      <input type="text" name="location" required>
+
+      <label>Phone Number:</label>
+      <input type="tel" name="phone" required>
+
+      <label>ID Number:</label>
+      <input type="text" name="id_number" required>
+
+      <label>Documents Submitted:</label>
+      <input type="checkbox" name="doc_form"> Application Form<br>
+      <input type="checkbox" name="doc_id"> Valid ID<br>
+      <input type="checkbox" name="doc_plan"> Business Plan
+    </div>
+
+    <div class="section">
+      <h2>Step 2: Review Status</h2>
+      <label>Documents Verified:</label>
+      <input type="checkbox" name="verified">
+    </div>
+
+    <div class="section">
+      <h2>Step 3: Payment</h2>
+      <label>Fee Amount (KES):</label>
+      <input type="number" name="amount" min="1000" max="50000">
+
+      <label>Receipt Number:</label>
+      <input type="text" name="receipt">
+    </div>
+
+    <div class="section">
+      <h2>Step 4: Inspection</h2>
+      <label>Site location confirmed?</label>
+      <input type="checkbox" name="site_confirmed">
+
+      <label>Safety compliance confirmed?</label>
+      <input type="checkbox" name="safety">
+
+      <label>Documents present on site?</label>
+      <input type="checkbox" name="onsite_docs">
+    </div>
+
+    <div class="section">
+      <h2>Step 5: Approval</h2>
+      <label>Approved:</label>
+      <input type="checkbox" name="approved">
+    </div>
+
+    <div class="section">
+      <h2>Step 6: Permit Issuance</h2>
+      <label>Permit Issued:</label>
+      <input type="checkbox" name="permit_issued">
+    </div>
+
+    <input type="submit" value="Submit Application">
+  </form>
+</body>
+</html>

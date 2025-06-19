@@ -1,0 +1,174 @@
+import time
+from colorama import init, Fore, Back, Style
+from pyfiglet import Figlet
+
+# Initialize colorama
+init(autoreset=True)
+
+# Banner
+fig = Figlet(font='slant')
+print(Back.GREEN + Fore.BLACK + fig.renderText('Kakamega Waste'))
+
+# Users and roles
+users = {
+    "resident1": {"password": "res123", "role": "resident"},
+    "staff1": {"password": "staff123", "role": "staff"},
+}
+
+# Status tracking
+STATUSES = [
+    "Submitted",
+    "Validated",
+    "Scheduled",
+    "Sent to Sanitation Team",
+    "Notified Resident",
+    "Collected",
+    "Resident Confirmed",
+    "Failed - Restart Required"
+]
+
+# Database (in-memory)
+requests_db = []
+
+# Garbage Request model
+class GarbageRequest:
+    def __init__(self, name, phone, location, quantity):
+        self.name = name
+        self.phone = phone
+        self.location = location
+        self.quantity = quantity
+        self.status = STATUSES[0]
+        self.schedule = None
+
+    def __str__(self):
+        return (f"{Back.GREEN}{Fore.BLACK}{self.name} | {self.location} | {self.quantity} | "
+                f"Status: {Fore.YELLOW}{self.status} | Schedule: {self.schedule or 'Not Set'}{Style.RESET_ALL}")
+
+# Login handler
+def login():
+    print(Back.GREEN + Fore.BLACK + "\n== LOGIN ==")
+    username = input("Username: ")
+    password = input("Password: ")
+    user = users.get(username)
+    if user and user["password"] == password:
+        print(Fore.GREEN + f"✅ Login successful as {user['role'].capitalize()}")
+        return user["role"]
+    else:
+        print(Fore.RED + "❌ Invalid credentials")
+        return None
+
+# Resident Interface
+def resident_menu():
+    while True:
+        print(Back.GREEN + Fore.BLACK + "\n== RESIDENT MENU ==")
+        print("1. Submit Garbage Collection Request")
+        print("2. Confirm Collection")
+        print("3. Logout")
+        choice = input(Fore.CYAN + "Choose: ")
+
+        if choice == "1":
+            name = input("Name: ")
+            phone = input("Phone: ")
+            location = input("Location: ")
+            print("Select Quantity:\n1. Truck\n2. Pick Up\n3. Wheel Barrow")
+            q = input("Choice: ")
+            quantity = {"1": "Truck", "2": "Pick Up", "3": "Wheel Barrow"}.get(q, "Unknown")
+            req = GarbageRequest(name, phone, location, quantity)
+            requests_db.append(req)
+            print(Fore.GREEN + "✅ Request submitted.")
+        elif choice == "2":
+            pending = [r for r in requests_db if r.status == "Notified Resident"]
+            if not pending:
+                print(Fore.YELLOW + "No requests to confirm.")
+                continue
+            for i, r in enumerate(pending):
+                print(f"{i + 1}. {r}")
+            try:
+                idx = int(input("Select request number: ")) - 1
+                collected = input("Was it collected? (yes/no): ").lower()
+                if collected == "yes":
+                    pending[idx].status = "Collected"
+                    confirm = input("Confirm collection? (yes/no): ").lower()
+                    if confirm == "yes":
+                        pending[idx].status = "Resident Confirmed"
+                        print(Fore.GREEN + "✅ Thank you for confirming.")
+                    else:
+                        pending[idx].status = "Failed - Restart Required"
+                else:
+                    pending[idx].status = "Failed - Restart Required"
+                    print(Fore.RED + "⚠️ Restart required.")
+            except:
+                print(Fore.RED + "Invalid input.")
+        elif choice == "3":
+            print(Fore.CYAN + "👋 Logging out...")
+            break
+        else:
+            print(Fore.RED + "Invalid choice.")
+
+# Staff Interface
+def staff_menu():
+    while True:
+        print(Back.GREEN + Fore.BLACK + "\n== STAFF MENU ==")
+        print("1. View All Requests")
+        print("2. Validate Requests")
+        print("3. Schedule Collection")
+        print("4. Notify Sanitation Team")
+        print("5. Notify Resident")
+        print("6. Logout")
+        choice = input(Fore.CYAN + "Choose: ")
+
+        if choice == "1":
+            if not requests_db:
+                print(Fore.YELLOW + "No requests yet.")
+            for i, r in enumerate(requests_db):
+                print(f"{i + 1}. {r}")
+        elif choice == "2":
+            for r in requests_db:
+                if r.status == "Submitted":
+                    r.status = "Validated"
+            print(Fore.GREEN + "✅ All 'Submitted' requests validated.")
+        elif choice == "3":
+            for r in requests_db:
+                if r.status == "Validated":
+                    r.schedule = input(f"Schedule for {r.name}: ")
+                    r.status = "Scheduled"
+            print(Fore.GREEN + "📅 Scheduling complete.")
+        elif choice == "4":
+            for r in requests_db:
+                if r.status == "Scheduled":
+                    r.status = "Sent to Sanitation Team"
+                    print(Fore.CYAN + f"🧹 Notified sanitation team for {r.name}")
+        elif choice == "5":
+            for r in requests_db:
+                if r.status == "Sent to Sanitation Team":
+                    r.status = "Notified Resident"
+                    print(Fore.GREEN + f"📩 Notified {r.phone} for collection at {r.schedule}")
+        elif choice == "6":
+            print(Fore.CYAN + "👋 Logging out...")
+            break
+        else:
+            print(Fore.RED + "Invalid choice.")
+
+# Main App
+def main():
+    while True:
+        print(Back.GREEN + Fore.BLACK + "\n== MAIN MENU ==")
+        print("1. Login")
+        print("2. Exit")
+        choice = input(Fore.CYAN + "Choose: ")
+
+        if choice == "1":
+            role = login()
+            if role == "resident":
+                resident_menu()
+            elif role == "staff":
+                staff_menu()
+        elif choice == "2":
+            print(Fore.GREEN + "👋 Goodbye!")
+            break
+        else:
+            print(Fore.RED + "Invalid choice.")
+
+# Entry point
+if __name__ == "__main__":
+    main()
